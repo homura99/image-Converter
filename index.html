@@ -10,7 +10,7 @@
 <main>
 <header class="hero">
   <h1>画像形式変換ツール</h1>
-  <div class="muted">画像を選択して、PNG・JPG・WebP・ICOに変換。処理はこのブラウザ内で行います。</div>
+  <div class="muted">画像を選択して、PNG・JPG・WebP・BMP・ICOに変換。処理はこのブラウザ内で行います。</div>
 </header>
 
 <section class="panel">
@@ -19,7 +19,7 @@
     <span class="muted">またはクリックしてファイルを選択（複数選択可）</span>
     <div style="margin-top:15px"><span class="file-button">画像を選択</span></div>
   </div>
-  <input id="files" type="file" accept="image/*,.avif,.heic,.heif" multiple hidden>
+  <input id="files" type="file" accept="image/*,.bmp,.avif,.heic,.heif" multiple hidden>
   <p class="status" id="status" aria-live="polite">画像を追加してください。</p>
 </section>
 
@@ -32,6 +32,7 @@
         <option value="image/png">PNG</option>
         <option value="image/jpeg">JPG</option>
         <option value="image/webp">WebP</option>
+        <option value="image/bmp">BMP</option>
         <option value="image/x-icon">ICO</option>
       </select>
     </div>
@@ -57,14 +58,14 @@
   </div>
   <div class="inline" style="margin-top:15px">
     <input id="whiteBg" type="checkbox" checked>
-    <label for="whiteBg">JPG変換時、透明部分を白背景にする</label>
+    <label for="whiteBg">JPG / BMP変換時、透明部分を白背景にする</label>
   </div>
   <div class="actions">
     <button id="convert">一括変換</button>
     <button id="downloadAll" class="secondary" disabled>変換済みをZIPで保存</button>
     <button id="clear" class="secondary">すべてクリア</button>
   </div>
-  <p class="notice">サイズ欄を空にすると元の寸法を使います。縦横比維持の場合、幅・高さの片方だけ指定すると、もう片方は自動計算されます。ICOは最大256×256pxのアイコンとして出力します。HEIC/HEIFの読み込みにはCDNからデコーダーを読み込みます。</p>
+  <p class="notice">サイズ欄を空にすると元の寸法を使います。縦横比維持の場合、幅・高さの片方だけ指定すると、もう片方は自動計算されます。JPG / BMPは透明部分を保持できません。ICOは最大256×256pxのアイコンとして出力します。HEIC/HEIFの読み込みにはCDNからデコーダーを読み込みます。</p>
 </section>
 
 <section class="panel">

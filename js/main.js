@@ -2,7 +2,7 @@
   const $ = id => document.getElementById(id);
   const drop = $('drop'), picker = $('files'), grid = $('grid');
   let items = [], nextId = 1, busy = false;
-  const mimeToExt = {'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/x-icon':'ico'};
+  const mimeToExt = {'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/bmp':'bmp','image/x-icon':'ico'};
   const fmtBytes = n => n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(2)} MB`;
   const setStatus = s => $('status').textContent = s;
   $('quality').addEventListener('input', () => $('qualityText').textContent = $('quality').value + '%');
@@ -117,6 +117,32 @@
   }
   function writeU16(view, offset, value) { view.setUint16(offset, value, true); }
   function writeU32(view, offset, value) { view.setUint32(offset, value, true); }
+  function toBmp(canvas) {
+    const {width, height} = canvas;
+    const rowSize = Math.ceil(width * 3 / 4) * 4;
+    const pixelDataSize = rowSize * height;
+    const buffer = new ArrayBuffer(54 + pixelDataSize);
+    const view = new DataView(buffer);
+    view.setUint8(0, 0x42); view.setUint8(1, 0x4d);
+    writeU32(view, 2, buffer.byteLength); writeU32(view, 10, 54);
+    writeU32(view, 14, 40); writeU32(view, 18, width); writeU32(view, 22, height);
+    writeU16(view, 26, 1); writeU16(view, 28, 24);
+    writeU32(view, 34, pixelDataSize);
+
+    const pixels = canvas.getContext('2d').getImageData(0, 0, width, height).data;
+    for (let y = 0; y < height; y++) {
+      const sourceRow = y * width * 4;
+      const targetRow = 54 + (height - 1 - y) * rowSize;
+      for (let x = 0; x < width; x++) {
+        const source = sourceRow + x * 4;
+        const target = targetRow + x * 3;
+        view.setUint8(target, pixels[source + 2]);
+        view.setUint8(target + 1, pixels[source + 1]);
+        view.setUint8(target + 2, pixels[source]);
+      }
+    }
+    return new Blob([buffer], {type:'image/bmp'});
+  }
   async function toIco(pngBlob, width, height) {
     if (width > 256 || height > 256) throw new Error('ICOは256×256px以下にしてください');
     const png = new Uint8Array(await pngBlob.arrayBuffer());
@@ -136,14 +162,16 @@
     const img = await loadImage(item.url);
     const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext('2d', {alpha:true});
-    if ($('format').value === 'image/jpeg' && $('whiteBg').checked) { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h); }
+    const fmt = $('format').value;
+    if ((fmt === 'image/jpeg' || fmt === 'image/bmp') && $('whiteBg').checked) { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h); }
     ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img,0,0,w,h);
     let blob;
-    const fmt = $('format').value;
     if (fmt === 'image/x-icon') {
       const png = await canvasBlob(canvas,'image/png');
       blob = await toIco(png,w,h);
+    } else if (fmt === 'image/bmp') {
+      blob = toBmp(canvas);
     } else {
       blob = await canvasBlob(canvas,fmt,Number($('quality').value)/100);
       if (blob.type !== fmt) throw new Error(`${fmt}形式に対応していないブラウザです`);
