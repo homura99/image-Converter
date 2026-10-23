@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>画像形式変換ツール</title>
+<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+<main>
+<header class="hero">
+  <h1>画像形式変換ツール</h1>
+  <div class="muted">画像を選択して、PNG・JPG・WebP・ICOに変換。処理はこのブラウザ内で行います。</div>
+</header>
+
+<section class="panel">
+  <div id="drop" class="drop" role="button" tabindex="0" aria-label="画像を追加">
+    <strong>画像をここにドラッグ＆ドロップ</strong>
+    <span class="muted">またはクリックしてファイルを選択（複数選択可）</span>
+    <div style="margin-top:15px"><span class="file-button">画像を選択</span></div>
+  </div>
+  <input id="files" type="file" accept="image/*,.avif,.heic,.heif" multiple hidden>
+  <p class="status" id="status" aria-live="polite">画像を追加してください。</p>
+</section>
+
+<section class="panel">
+  <h2 style="margin-top:0">変換設定</h2>
+  <div class="controls">
+    <div class="field">
+      <label for="format">出力形式</label>
+      <select id="format">
+        <option value="image/png">PNG</option>
+        <option value="image/jpeg">JPG</option>
+        <option value="image/webp">WebP</option>
+        <option value="image/x-icon">ICO</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="width">出力幅（px）</label>
+      <input id="width" type="number" min="1" max="12000" placeholder="元の幅">
+    </div>
+    <div class="field">
+      <label for="height">出力高さ（px）</label>
+      <input id="height" type="number" min="1" max="12000" placeholder="元の高さ">
+    </div>
+    <div class="field">
+      <label for="fit">サイズ変更方法</label>
+      <select id="fit">
+        <option value="contain">縦横比を維持</option>
+        <option value="stretch">幅・高さに合わせる</option>
+      </select>
+    </div>
+  </div>
+  <div class="field" style="margin-top:17px">
+    <div class="range-label"><label for="quality">画質（JPG / WebP）</label><span id="qualityText">90%</span></div>
+    <input id="quality" type="range" min="10" max="100" value="90">
+  </div>
+  <div class="inline" style="margin-top:15px">
+    <input id="whiteBg" type="checkbox" checked>
+    <label for="whiteBg">JPG変換時、透明部分を白背景にする</label>
+  </div>
+  <div class="actions">
+    <button id="convert">一括変換</button>
+    <button id="downloadAll" class="secondary" disabled>変換済みをZIPで保存</button>
+    <button id="clear" class="secondary">すべてクリア</button>
+  </div>
+  <p class="notice">サイズ欄を空にすると元の寸法を使います。縦横比維持の場合、幅・高さの片方だけ指定すると、もう片方は自動計算されます。ICOは最大256×256pxのアイコンとして出力します。HEIC/HEIFの読み込みにはCDNからデコーダーを読み込みます。</p>
+</section>
+
+<section class="panel">
+  <div class="list-head">
+    <div><h2 style="margin:0">画像一覧</h2><div class="muted" id="count">0件</div></div>
+  </div>
+  <div id="grid" class="grid"></div>
+</section>
+<footer>画像データは外部サーバーへ送信されません。変換はお使いのブラウザ内で実行されます。</footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script src="./js/main.js"></script>
+</body>
+</html>
