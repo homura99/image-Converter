@@ -17,7 +17,7 @@
   $('downloadAll').addEventListener('click', downloadZip);
 
   function addFiles(fileList) {
-    const incoming = [...fileList].filter(f => f.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|bmp|avif|heic|heif|ico|tiff?)$/i.test(f.name));
+    const incoming = [...fileList].filter(f => f.type.startsWith('image/') || /\.(png|jpe?g|jfif|webp|gif|bmp|avif|heic|heif|ico|tiff?)$/i.test(f.name));
     if (!incoming.length) { setStatus('画像ファイルが見つかりませんでした。'); return; }
     for (const file of incoming) {
       const item = {id: nextId++, file, url:null, result:null, resultUrl:null, error:null, loading:true, name:file.name.replace(/\.[^.]+$/, '') || 'image'};
